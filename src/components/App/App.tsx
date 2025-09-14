@@ -1,11 +1,55 @@
-import SearchForm from "../SearchBar/SearchBar";
+import SearchBar from "../SearchBar/SearchBar";
+import toast, { Toaster } from "react-hot-toast";
+import MovieGrid from "../MovieGrid/MovieGrid";
+import Loader from "../Loader/Loader";
+import ErrorMessage from "../ErrorMessage/ErrorMessage";
+import MovieModal from "../MovieModal/MovieModal";
+import styles from "./App.module.css";
+import { useState } from "react";
+import type { Movie } from "../../types/movie";
+import { fetchMovies } from "../../services/movieService";
 
-const App = () => {
-  const handleSubmit = (searchValue: string) => {
-    // console.log("🔎 Search query:", searchValue);
+function App() {
+  const [movies, setMovies] = useState<Movie[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isError, setIsError] = useState(false);
+  const [selectedMovie, setSelectedMovie] = useState<Movie | null>(null);
+
+  const openModal = (movie: Movie) => setSelectedMovie(movie);
+  const closeModal = () => setSelectedMovie(null);
+
+  const handleSubmit = async (searchValue: string) => {
+    try {
+      setIsLoading(true);
+      setIsError(false);
+
+      const data = await fetchMovies(searchValue);
+
+      if (data.length === 0) {
+        toast.error("No movies found for your request.");
+        return;
+      }
+
+      setMovies(data);
+    } catch {
+      setIsError(true);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
-  return <SearchForm onSearch={handleSubmit} />;
-};
+  return (
+    <div className={styles.container}>
+      <Toaster />
+      <SearchBar onSearch={handleSubmit} />
+      {isLoading && <Loader />}
+      {isError && <ErrorMessage />}
+      {movies.length > 0 && <MovieGrid onSelect={openModal} movies={movies} />}
+      {selectedMovie && (
+        <MovieModal movie={selectedMovie} onClose={closeModal} />
+      )}
+    </div>
+  );
+}
 
 export default App;
