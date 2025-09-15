@@ -1,4 +1,7 @@
+# environment files
 .env
+.env.local
+token.env
 
 # Logs
 logs

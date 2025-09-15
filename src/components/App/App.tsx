@@ -52,4 +52,6 @@ function App() {
   );
 }
 
+console.log("TMDB Token from env:", import.meta.env.VITE_TMDB_TOKEN);
+
 export default App;
