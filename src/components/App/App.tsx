@@ -41,7 +41,7 @@ function App() {
   return (
     <div className={styles.container}>
       <Toaster />
-      <SearchBar onSearch={handleSubmit} />
+      <SearchBar onSubmit={handleSubmit} />
       {isLoading && <Loader />}
       {isError && <ErrorMessage />}
       {movies.length > 0 && <MovieGrid onSelect={openModal} movies={movies} />}
